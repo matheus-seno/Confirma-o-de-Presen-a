@@ -527,5 +527,28 @@
       }
     }
   </script>
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCcNWxFAl_DOVk98NOYbhZRutIts9oj89U",
+    authDomain: "app-dia-das-criancas.firebaseapp.com",
+    projectId: "app-dia-das-criancas",
+    storageBucket: "app-dia-das-criancas.firebasestorage.app",
+    messagingSenderId: "861640860429",
+    appId: "1:861640860429:web:cbab959cb8d981dc348644",
+    measurementId: "G-ZTW34XCK8H"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 </body>
 </html>
