@@ -311,7 +311,7 @@
       </div>
 
       <div class="form-group">
-        <label for="igreja">Igreja que frequenta:</label>
+        <label for="igreja">Comum:</label>
         <input type="text" id="igreja" required placeholder="Nome da sua igreja">
       </div>
 
@@ -321,12 +321,12 @@
 
   <!-- VISÃO ADMINISTRADOR -->
   <div id="admin-view" class="container view-section">
-    <h2>📋 Lista de Confirmados (Admin)</h2>
+    <h2>📋 Lista de Confirmados</h2>
 
     <div id="admin-login">
       <div class="form-group">
         <label for="admin-pass">Senha de Acesso:</label>
-        <input type="password" id="admin-pass" placeholder="Digite a senha (padrão: 1234)">
+        <input type="password" id="admin-pass" placeholder="Digite a senha ">
       </div>
       <button type="button" onclick="loginAdmin()">Entrar no Painel</button>
     </div>
@@ -361,7 +361,7 @@
   <script>
     // Configurações e Inicialização
     const EVENT_DATE = new Date('2026-10-11T00:00:00').getTime();
-    const ADMIN_PASSWORD = "1234"; // Alterar senha do administrador aqui
+    const ADMIN_PASSWORD = "403311"; // Alterar senha do administrador aqui
 
     // 1. Transição da Tela Inicial para o App
     function startApp() {
