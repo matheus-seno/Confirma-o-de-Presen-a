@@ -6,7 +6,6 @@
   <title>Confirmação de Presença</title>
   
   <style>
-    
     @font-face {
       font-family: 'ManufacturingConsent';
       src: local('ManufacturingConsent'), local('ManufacturingConsent');
@@ -27,7 +26,6 @@
       font-family: 'Manufacturing Consent', sans-serif;
     }
 
-   
     body {
       background: linear-gradient(135deg, #E1F5FE, #B3E5FC, #81D4FA, #4DD0E1);
       background-attachment: fixed;
@@ -159,14 +157,19 @@
       box-shadow: 0 4px 10px rgba(2, 136, 209, 0.3);
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
       background-color: #0277BD;
       transform: translateY(-2px);
+    }
+    
+    button:disabled {
+      background-color: #90CAF9;
+      cursor: not-allowed;
     }
 
     /* Abas */
     .nav-tabs {
-      display: none; /* Escondido na tela inicial */
+      display: none;
       gap: 10px;
       margin-bottom: 20px;
       width: 100%;
@@ -215,7 +218,6 @@
       color: var(--primary);
     }
 
-    /* Checkbox modificado no Admin */
     .checkin-box {
       width: 20px;
       height: 20px;
@@ -264,7 +266,6 @@
     <h1>Bem-vindo!</h1>
     <p class="subtitle">Festa do Dia das Crianças 2026</p>
     
-    
     <img src="crianças.jpeg" alt="Foto do Evento" class="image-placeholder">
     
     <p style="margin-bottom: 20px; color: #555;">Estamos muito felizes em convidar você para o nosso evento especial.</p>
@@ -272,7 +273,7 @@
     <button onclick="startApp()">Avançar para Confirmação</button>
   </div>
 
-  <!-- ABAS DE NAVEGAÇÃO (Ficam ocultas até clicar em Avançar) -->
+  <!-- ABAS DE NAVEGAÇÃO -->
   <div id="app-tabs" class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('public')">Confirmar Presença</button>
     <button class="tab-btn" onclick="switchTab('admin')">Área Admin</button>
@@ -311,11 +312,11 @@
       </div>
 
       <div class="form-group">
-        <label for="igreja">Comum:</label>
+        <label for="igreja">Comum (Igreja):</label>
         <input type="text" id="igreja" required placeholder="Nome da sua igreja">
       </div>
 
-      <button type="submit">Confirmar Minha Presença</button>
+      <button type="submit" id="btn-submit">Confirmar Minha Presença</button>
     </form>
   </div>
 
@@ -326,7 +327,7 @@
     <div id="admin-login">
       <div class="form-group">
         <label for="admin-pass">Senha de Acesso:</label>
-        <input type="password" id="admin-pass" placeholder="Digite a senha ">
+        <input type="password" id="admin-pass" placeholder="Digite a senha">
       </div>
       <button type="button" onclick="loginAdmin()">Entrar no Painel</button>
     </div>
@@ -338,7 +339,7 @@
         <table>
           <thead>
             <tr>
-              <th style="text-align: center;">Check-in</th> <!-- Nova Coluna -->
+              <th style="text-align: center;">Check-in</th>
               <th>Data/Hora</th>
               <th>Nome Completo</th>
               <th>Idade</th>
@@ -352,27 +353,172 @@
       </div>
 
       <div class="actions-admin">
-        <button class="btn-secondary" onclick="exportToCSV()">Baixar em Excel (CSV)</button>
+        <button class="btn-secondary" onclick="exportToCSV()">Baixar Excel (CSV)</button>
         <button class="btn-danger" onclick="clearData()">Limpar Lista</button>
       </div>
     </div>
   </div>
 
-  <script>
-    // Configurações e Inicialização
-    const EVENT_DATE = new Date('2026-10-11T00:00:00').getTime();
-    const ADMIN_PASSWORD = "403311"; // Alterar senha do administrador aqui
+  <!-- ÚNICO SCRIPT: Lógica e Firebase Juntos -->
+  <script type="module">
+    // Importações do Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"; 
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js"; 
 
-    // 1. Transição da Tela Inicial para o App
-    function startApp() {
+    // Suas Configurações do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCcNWxFAl_DOVk98NOYbhZRutIts9oj89U",
+      authDomain: "app-dia-das-criancas.firebaseapp.com",
+      projectId: "app-dia-das-criancas",
+      storageBucket: "app-dia-das-criancas.firebasestorage.app",
+      messagingSenderId: "861640860429",
+      appId: "1:861640860429:web:cbab959cb8d981dc348644",
+      measurementId: "G-ZTW34XCK8H"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const EVENT_DATE = new Date('2026-10-11T00:00:00').getTime();
+    const ADMIN_PASSWORD = "403311";
+
+    // --- FUNÇÕES GLOBAIS (window.) ---
+
+    // 1. Iniciar App
+    window.startApp = function() {
       document.getElementById('welcome-screen').style.display = 'none';
       document.getElementById('app-tabs').style.display = 'flex';
-      
-      // Mostrar a tela pública ao avançar
       document.getElementById('public-view').classList.add('active');
+    };
+
+    // 2. Navegação por Abas
+    window.switchTab = function(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+
+      if (tab === 'public') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('public-view').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('admin-view').classList.add('active');
+      }
+    };
+
+    // 3. Lógica do Administrador
+    window.loginAdmin = async function() {
+      const passInput = document.getElementById('admin-pass').value;
+      if (passInput === ADMIN_PASSWORD) {
+        document.getElementById('admin-login').style.display = 'none';
+        document.getElementById('admin-content').style.display = 'block';
+        await renderAdminList();
+      } else {
+        alert('Senha incorreta!');
+      }
+    };
+
+    // 4. Buscar e Renderizar Lista do Banco de Dados
+    async function renderAdminList() {
+      const tbody = document.getElementById('confirmations-list');
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Carregando lista da nuvem...</td></tr>';
+      
+      try {
+        const querySnapshot = await getDocs(collection(db, "confirmacoes"));
+        const list = [];
+        
+        querySnapshot.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+
+        document.getElementById('total-count').innerText = list.length;
+        window.adminDataList = list; // Salva para exportar para CSV
+        tbody.innerHTML = '';
+
+        list.forEach((item) => {
+          const isChecked = item.checkin ? 'checked' : '';
+          const bgColor = item.checkin ? 'background-color: #f1f8e9;' : '';
+          
+          const row = document.createElement('tr');
+          row.style = bgColor;
+          row.innerHTML = `
+            <td style="text-align: center;">
+              <input type="checkbox" class="checkin-box" ${isChecked} onchange="toggleCheckin('${item.id}', this.checked)">
+            </td>
+            <td>${item.timestamp}</td>
+            <td><strong>${item.nome}</strong></td>
+            <td>${item.idade}</td>
+            <td>${item.igreja}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Erro ao carregar dados. Verifique a conexão.</td></tr>';
+        console.error("Erro ao carregar dados: ", error);
+      }
     }
 
-    // 2. Lógica da Contagem Regressiva
+    // 5. Atualizar Check-in na Nuvem
+    window.toggleCheckin = async function(docId, isChecked) {
+      try {
+        const docRef = doc(db, "confirmacoes", docId);
+        await updateDoc(docRef, { checkin: isChecked });
+        renderAdminList(); // Atualiza as cores da tabela
+      } catch (error) {
+        alert("Erro ao salvar check-in!");
+        console.error("Erro ao atualizar checkin:", error);
+      }
+    };
+
+    // 6. Exportar para CSV
+    window.exportToCSV = function() {
+      const list = window.adminDataList || [];
+      if (list.length === 0) {
+        alert('Nenhuma confirmação para exportar.');
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+      csvContent += "Check-in;Data/Hora;Nome Completo;Idade;Igreja\n";
+
+      list.forEach(item => {
+        const checkinStatus = item.checkin ? "Sim" : "Não";
+        csvContent += `"${checkinStatus}";"${item.timestamp}";"${item.nome}";"${item.idade}";"${item.igreja}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "confirmados_dia_das_criancas.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    // 7. Apagar Tudo no Banco de Dados
+    window.clearData = async function() {
+      if (confirm('ATENÇÃO: Deseja apagar toda a lista de confirmados DEFINITIVAMENTE da nuvem?')) {
+        try {
+          const querySnapshot = await getDocs(collection(db, "confirmacoes"));
+          const deletePromises = [];
+          
+          querySnapshot.forEach((documento) => {
+            deletePromises.push(deleteDoc(doc(db, "confirmacoes", documento.id)));
+          });
+          
+          await Promise.all(deletePromises);
+          alert("Lista limpa com sucesso!");
+          renderAdminList();
+        } catch (error) {
+          alert("Erro ao limpar lista.");
+          console.error(error);
+        }
+      }
+    };
+
+    // --- EVENTOS INTERNOS ---
+
+    // Lógica da Contagem Regressiva
     function updateCountdown() {
       const now = new Date().getTime();
       const distance = EVENT_DATE - now;
@@ -392,163 +538,48 @@
       document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
       document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
     }
-
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // 3. Lógica de Navegação por Abas
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-
-      if (tab === 'public') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('public-view').classList.add('active');
-      } else {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('admin-view').classList.add('active');
-      }
-    }
-
-    // 4. Salvar Confirmação
-    document.getElementById('rsvp-form').addEventListener('submit', function(e) {
+    // Salvar Nova Confirmação no Firebase
+    document.getElementById('rsvp-form').addEventListener('submit', async function(e) {
       e.preventDefault();
+      
+      const submitBtn = document.getElementById('btn-submit');
+      submitBtn.innerText = "Salvando...";
+      submitBtn.disabled = true;
 
       const newConfirmation = {
-        id: Date.now(), // ID único para garantir a exatidão do check-in
         timestamp: new Date().toLocaleString('pt-BR'),
         nome: document.getElementById('nome').value,
         idade: document.getElementById('idade').value,
         igreja: document.getElementById('igreja').value,
-        checkin: false // Propriedade nova para o Check-in
+        checkin: false // Por padrão entra como false (sem check-in)
       };
 
-      const currentList = JSON.parse(localStorage.getItem('rsvp_records') || '[]');
-      currentList.push(newConfirmation);
-      localStorage.setItem('rsvp_records', JSON.stringify(currentList));
-
-      // Exibir feedback e limpar campo
-      document.getElementById('success-message').style.display = 'block';
-      this.reset();
-
-      setTimeout(() => {
-        document.getElementById('success-message').style.display = 'none';
-      }, 4000);
-
-      if (document.getElementById('admin-content').style.display === 'block') {
-         renderAdminList();
-      }
-    });
-
-    // 5. Lógica do Administrador e Check-in
-    function loginAdmin() {
-      const passInput = document.getElementById('admin-pass').value;
-      if (passInput === ADMIN_PASSWORD) {
-        document.getElementById('admin-login').style.display = 'none';
-        document.getElementById('admin-content').style.display = 'block';
-        renderAdminList();
-      } else {
-        alert('Senha incorreta!');
-      }
-    }
-
-    function renderAdminList() {
-      const list = JSON.parse(localStorage.getItem('rsvp_records') || '[]');
-      const tbody = document.getElementById('confirmations-list');
-      document.getElementById('total-count').innerText = list.length;
-      
-      tbody.innerHTML = '';
-      
-      list.forEach((item, index) => {
-        // Garantir que registros antigos tenham o estado de checkin false
-        const isChecked = item.checkin ? 'checked' : '';
-        const row = document.createElement('tr');
+      try {
+        await addDoc(collection(db, "confirmacoes"), newConfirmation);
         
-        // Se a pessoa estiver com checkin, pinta a linha de verde claro
-        if(item.checkin) {
-            row.style.backgroundColor = '#f1f8e9'; 
+        document.getElementById('success-message').style.display = 'block';
+        this.reset();
+        
+        setTimeout(() => {
+          document.getElementById('success-message').style.display = 'none';
+        }, 4000);
+
+        // Se a aba do admin estiver aberta, atualiza a lista em tempo real
+        if (document.getElementById('admin-content').style.display === 'block') {
+           renderAdminList();
         }
 
-        row.innerHTML = `
-          <td style="text-align: center;">
-            <input type="checkbox" class="checkin-box" ${isChecked} onchange="toggleCheckin(${index})">
-          </td>
-          <td>${item.timestamp}</td>
-          <td><strong>${item.nome}</strong></td>
-          <td>${item.idade}</td>
-          <td>${item.igreja}</td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    // Função para alterar o status do Check-in
-    function toggleCheckin(index) {
-      const list = JSON.parse(localStorage.getItem('rsvp_records') || '[]');
-      
-      // Inverte o estado atual do checkin (true vira false, false vira true)
-      list[index].checkin = !list[index].checkin; 
-      
-      localStorage.setItem('rsvp_records', JSON.stringify(list));
-      
-      // Re-renderiza a lista para aplicar as cores e manter sincronizado
-      renderAdminList();
-    }
-
-    function exportToCSV() {
-      const list = JSON.parse(localStorage.getItem('rsvp_records') || '[]');
-      if (list.length === 0) {
-        alert('Nenhuma confirmação para exportar.');
-        return;
+      } catch (error) {
+        alert("Erro ao confirmar presença. Verifique sua internet.");
+        console.error("Erro ao adicionar documento: ", error);
+      } finally {
+        submitBtn.innerText = "Confirmar Minha Presença";
+        submitBtn.disabled = false;
       }
-
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-      // Adicionado coluna Check-in no export
-      csvContent += "Check-in;Data/Hora;Nome Completo;Idade;Igreja\n";
-
-      list.forEach(item => {
-        const checkinStatus = item.checkin ? "Sim" : "Não";
-        csvContent += `"${checkinStatus}";"${item.timestamp}";"${item.nome}";"${item.idade}";"${item.igreja}"\n`;
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "confirmados_dia_das_criancas.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function clearData() {
-      if (confirm('Tem certeza que deseja apagar toda a lista de confirmados? Essa ação não pode ser desfeita.')) {
-        localStorage.removeItem('rsvp_records');
-        renderAdminList();
-      }
-    }
+    });
   </script>
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCcNWxFAl_DOVk98NOYbhZRutIts9oj89U",
-    authDomain: "app-dia-das-criancas.firebaseapp.com",
-    projectId: "app-dia-das-criancas",
-    storageBucket: "app-dia-das-criancas.firebasestorage.app",
-    messagingSenderId: "861640860429",
-    appId: "1:861640860429:web:cbab959cb8d981dc348644",
-    measurementId: "G-ZTW34XCK8H"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
 </body>
 </html>
