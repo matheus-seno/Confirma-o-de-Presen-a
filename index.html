@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmação de Presença</title>
+  
+  <style>
+    /* Definindo a fonte caso o usuário tenha o arquivo local. Caso não tenha, usa sans-serif */
+    @font-face {
+      font-family: 'ManufacturingConsent';
+      src: local('ManufacturingConsent'), local('ManufacturingConsent');
+    }
+
+    :root {
+      --primary: #0288D1;      
+      --secondary: #4DD0E1;    
+      --accent: #00BCD4;      
+      --card-bg: #FFFFFF;
+      --text: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Manufacturing Consent', sans-serif;
+    }
+
+   
+    body {
+      background: linear-gradient(135deg, #E1F5FE, #B3E5FC, #81D4FA, #4DD0E1);
+      background-attachment: fixed;
+      color: var(--text);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    /* Tela Inicial (Landing Page) */
+    #welcome-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .image-placeholder {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 15px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border: 4px solid var(--secondary);
+    }
+
+    /* Contagem Regressiva */
+    .countdown-container {
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      color: white;
+      border-radius: 15px;
+      padding: 15px;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .countdown-timer {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+
+    .timer-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .timer-unit span:first-child {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .timer-unit span:last-child {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+      width: 100%;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    input[type="text"], input[type="number"], input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #B3E5FC;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(2, 136, 209, 0.3);
+    }
+
+    button:hover {
+      background-color: #0277BD;
+      transform: translateY(-2px);
+    }
+
+    /* Abas */
+    .nav-tabs {
+      display: none; /* Escondido na tela inicial */
+      gap: 10px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      background: #E0E0E0;
+      color: #333;
+      border-radius: 10px;
+      font-weight: bold;
+      box-shadow: none;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    /* Tabela Admin */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid #DDD;
+      padding: 10px;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background-color: #E1F5FE;
+      color: var(--primary);
+    }
+
+    /* Checkbox modificado no Admin */
+    .checkin-box {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    .alert-success {
+      background-color: #D4EDDA;
+      color: #155724;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      display: none;
+      text-align: center;
+      border: 1px solid #c3e6cb;
+    }
+
+    .actions-admin {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn-secondary {
+      background-color: var(--accent);
+    }
+
+    .btn-secondary:hover {
+      background-color: #00ACC1;
+    }
+    
+    .btn-danger {
+      background-color: #f44336;
+    }
+    
+    .btn-danger:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. TELA INICIAL -->
+  <div id="welcome-screen" class="container">
+    <h1>Bem-vindo!</h1>
+    <p class="subtitle">Festa do Dia das Crianças 2026</p>
+    
+    <!-- Imagem Placeholder (Substitua o src pela sua foto) -->
+    <img src="crianças.jpeg" alt="Foto do Evento" class="image-placeholder">
+    
+    <p style="margin-bottom: 20px; color: #555;">Estamos muito felizes em convidar você para o nosso evento especial.</p>
+    
+    <button onclick="startApp()">Avançar para Confirmação</button>
+  </div>
+
+  <!-- ABAS DE NAVEGAÇÃO (Ficam ocultas até clicar em Avançar) -->
+  <div id="app-tabs" class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('public')">Confirmar Presença</button>
+    <button class="tab-btn" onclick="switchTab('admin')">Área Admin</button>
+  </div>
+
+  <!-- VISÃO PÚBLICA -->
+  <div id="public-view" class="container view-section">
+    <h1>🎉 Confirme sua Presença 🎈</h1>
+    <p class="subtitle">Dia 11 de Outubro de 2026</p>
+
+    <!-- Contagem Regressiva -->
+    <div class="countdown-container">
+      <h3>Faltam para o evento:</h3>
+      <div class="countdown-timer">
+        <div class="timer-unit"><span id="days">00</span><span>Dias</span></div>
+        <div class="timer-unit"><span id="hours">00</span><span>Horas</span></div>
+        <div class="timer-unit"><span id="minutes">00</span><span>Min</span></div>
+        <div class="timer-unit"><span id="seconds">00</span><span>Seg</span></div>
+      </div>
+    </div>
+
+    <div id="success-message" class="alert-success">
+      ✅ Presença confirmada com sucesso! Nos vemos lá!
+    </div>
+
+    <!-- Formulário -->
+    <form id="rsvp-form">
+      <div class="form-group">
+        <label for="nome">Nome Completo:</label>
+        <input type="text" id="nome" required placeholder="Digite seu nome completo">
+      </div>
+
+      <div class="form-group">
+        <label for="idade">Idade:</label>
+        <input type="number" id="idade" min="0" max="120" required placeholder="Sua idade">
+      </div>
+
+      <div class="form-group">
+        <label for="igreja">Igreja que frequenta:</label>
+        <input type="text" id="igreja" required placeholder="Nome da sua igreja">
+      </div>
+
+      <button type="submit">Confirmar Minha Presença</button>
+    </form>
+  </div>
+
+  <!-- VISÃO ADMINISTRADOR -->
+  <div id="admin-view" class="container view-section">
+    <h2>📋 Lista de Confirmados (Admin)</h2>
+
+    <div id="admin-login">
+      <div class="form-group">
+        <label for="admin-pass">Senha de Acesso:</label>
+        <input type="password" id="admin-pass" placeholder="Digite a senha (padrão: 1234)">
+      </div>
+      <button type="button" onclick="loginAdmin()">Entrar no Painel</button>
+    </div>
+
+    <div id="admin-content" style="display: none;">
+      <p style="margin-bottom: 10px;"><strong>Total de confirmados:</strong> <span id="total-count">0</span></p>
+
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align: center;">Check-in</th> <!-- Nova Coluna -->
+              <th>Data/Hora</th>
+              <th>Nome Completo</th>
+              <th>Idade</th>
+              <th>Igreja</th>
+            </tr>
+          </thead>
+          <tbody id="confirmations-list">
+            <!-- Registros preenchidos via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="actions-admin">
+        <button class="btn-secondary" onclick="exportToCSV()">Baixar em Excel (CSV)</button>
+        <button class="btn-danger" onclick="clearData()">Limpar Lista</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configurações e Inicialização
+    const EVENT_DATE = new Date('2026-10-11T00:00:00').getTime();
+    const ADMIN_PASSWORD = "1234"; // Alterar senha do administrador aqui
+
+    // 1. Transição da Tela Inicial para o App
+    function startApp() {
+      document.getElementById('welcome-screen').style.display = 'none';
+      document.getElementById('app-tabs').style.display = 'flex';
+      
+      // Mostrar a tela pública ao avançar
+      document.getElementById('public-view').classList.add('active');
+    }
+
+    // 2. Lógica da Contagem Regressiva
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = EVENT_DATE - now;
+
+      if (distance < 0) {
+        document.querySelector('.countdown-container').innerHTML = "<h3>🎉 O evento começou! 🎉</h3>";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById('days').innerText = String(days).padStart(2, '0');
+      document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+      document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+      document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // 3. Lógica de Navegação por Abas
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+
+      if (tab === 'public') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('public-view').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('admin-view').classList.add('active');
+      }
+    }
+
+    // 4. Salvar Confirmação
+    document.getElementById('rsvp-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const newConfirmation = {
+        id: Date.now(), // ID único para garantir a exatidão do check-in
+        timestamp: new Date().toLocaleString('pt-BR'),
+        nome: document.getElementById('nome').value,
+        idade: document.getElementById('idade').value,
+        igreja: document.getElementById('igreja').value,
+        checkin: false // Propriedade nova para o Check-in
+      };
+
+      const currentList = JSON.parse(localStorage.getItem('rsvp_records') || '[]');
+      currentList.push(newConfirmation);
+      localStorage.setItem('rsvp_records', JSON.stringify(currentList));
+
+      // Exibir feedback e limpar campo
+      document.getElementById('success-message').style.display = 'block';
+      this.reset();
+
+      setTimeout(() => {
+        document.getElementById('success-message').style.display = 'none';
+      }, 4000);
+
+      if (document.getElementById('admin-content').style.display === 'block') {
+         renderAdminList();
+      }
+    });
+
+    // 5. Lógica do Administrador e Check-in
+    function loginAdmin() {
+      const passInput = document.getElementById('admin-pass').value;
+      if (passInput === ADMIN_PASSWORD) {
+        document.getElementById('admin-login').style.display = 'none';
+        document.getElementById('admin-content').style.display = 'block';
+        renderAdminList();
+      } else {
+        alert('Senha incorreta!');
+      }
+    }
+
+    function renderAdminList() {
+      const list = JSON.parse(localStorage.getItem('rsvp_records') || '[]');
+      const tbody = document.getElementById('confirmations-list');
+      document.getElementById('total-count').innerText = list.length;
+      
+      tbody.innerHTML = '';
+      
+      list.forEach((item, index) => {
+        // Garantir que registros antigos tenham o estado de checkin false
+        const isChecked = item.checkin ? 'checked' : '';
+        const row = document.createElement('tr');
+        
+        // Se a pessoa estiver com checkin, pinta a linha de verde claro
+        if(item.checkin) {
+            row.style.backgroundColor = '#f1f8e9'; 
+        }
+
+        row.innerHTML = `
+          <td style="text-align: center;">
+            <input type="checkbox" class="checkin-box" ${isChecked} onchange="toggleCheckin(${index})">
+          </td>
+          <td>${item.timestamp}</td>
+          <td><strong>${item.nome}</strong></td>
+          <td>${item.idade}</td>
+          <td>${item.igreja}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Função para alterar o status do Check-in
+    function toggleCheckin(index) {
+      const list = JSON.parse(localStorage.getItem('rsvp_records') || '[]');
+      
+      // Inverte o estado atual do checkin (true vira false, false vira true)
+      list[index].checkin = !list[index].checkin; 
+      
+      localStorage.setItem('rsvp_records', JSON.stringify(list));
+      
+      // Re-renderiza a lista para aplicar as cores e manter sincronizado
+      renderAdminList();
+    }
+
+    function exportToCSV() {
+      const list = JSON.parse(localStorage.getItem('rsvp_records') || '[]');
+      if (list.length === 0) {
+        alert('Nenhuma confirmação para exportar.');
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+      // Adicionado coluna Check-in no export
+      csvContent += "Check-in;Data/Hora;Nome Completo;Idade;Igreja\n";
+
+      list.forEach(item => {
+        const checkinStatus = item.checkin ? "Sim" : "Não";
+        csvContent += `"${checkinStatus}";"${item.timestamp}";"${item.nome}";"${item.idade}";"${item.igreja}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "confirmados_dia_das_criancas.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function clearData() {
+      if (confirm('Tem certeza que deseja apagar toda a lista de confirmados? Essa ação não pode ser desfeita.')) {
+        localStorage.removeItem('rsvp_records');
+        renderAdminList();
+      }
+    }
+  </script>
+</body>
+</html>
