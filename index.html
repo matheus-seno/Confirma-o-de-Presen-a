@@ -19,22 +19,29 @@
       --text: #333333;
     }
 
+    /* Esconde as barras de rolagem mas mantém a funcionalidade de scroll */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: 'Manufacturing Consent', sans-serif;
+      scrollbar-width: none; /* Firefox */
     }
 
     body {
       background: linear-gradient(135deg, #E1F5FE, #B3E5FC, #81D4FA, #4DD0E1);
       background-attachment: fixed;
       color: var(--text);
-      padding: 20px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     .container {
@@ -42,9 +49,9 @@
       max-width: 600px;
       background: var(--card-bg);
       border-radius: 20px;
-      padding: 25px;
+      padding: 20px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       animation: fadeIn 0.5s ease-in-out;
     }
 
@@ -56,14 +63,15 @@
     h1, h2 {
       text-align: center;
       color: var(--primary);
-      margin-bottom: 15px;
+      margin-bottom: 10px;
+      font-size: 1.5rem;
     }
 
     .subtitle {
       text-align: center;
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: #666;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     /* Tela Inicial (Landing Page) */
@@ -76,10 +84,10 @@
 
     .image-placeholder {
       width: 100%;
-      max-width: 400px;
+      max-width: 350px;
       height: auto;
       border-radius: 15px;
-      margin-bottom: 25px;
+      margin-bottom: 15px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       border: 4px solid var(--secondary);
     }
@@ -89,68 +97,63 @@
       background: linear-gradient(135deg, var(--secondary), var(--primary));
       color: white;
       border-radius: 15px;
-      padding: 15px;
+      padding: 10px;
       text-align: center;
-      margin-bottom: 25px;
+      margin-bottom: 15px;
     }
 
     .countdown-timer {
       display: flex;
       justify-content: space-around;
-      margin-top: 10px;
-    }
-
-    .timer-unit {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      margin-top: 5px;
     }
 
     .timer-unit span:first-child {
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       font-weight: bold;
     }
 
     .timer-unit span:last-child {
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
     }
 
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       text-align: left;
       width: 100%;
     }
 
     label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 3px;
       font-weight: bold;
       color: #555;
+      font-size: 0.9rem;
     }
 
-    input[type="text"], input[type="number"], input[type="password"] {
+    input[type="text"], input[type="number"], input[type="password"], select {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       border: 2px solid #B3E5FC;
       border-radius: 10px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       transition: border-color 0.3s;
     }
 
-    input:focus {
+    input:focus, select:focus {
       outline: none;
       border-color: var(--accent);
     }
 
     button {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       background-color: var(--primary);
       color: white;
       border: none;
       border-radius: 10px;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -171,7 +174,7 @@
     .nav-tabs {
       display: none;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       width: 100%;
       max-width: 600px;
     }
@@ -199,41 +202,92 @@
       display: block;
     }
 
+    /* Filtros Admin */
+    .filters-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .filters-container input, .filters-container select {
+      flex: 1;
+      min-width: 120px;
+      padding: 8px;
+      font-size: 0.85rem;
+    }
+
     /* Tabela Admin */
+    .table-wrapper {
+      max-height: 45vh; /* Limita a altura da tabela */
+      overflow-y: auto; /* Adiciona rolagem interna caso passe do limite */
+      border-radius: 8px;
+      border: 1px solid #DDD;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
+      table-layout: fixed;
     }
 
     th, td {
-      border: 1px solid #DDD;
-      padding: 10px;
+      border-bottom: 1px solid #DDD;
+      padding: 8px 4px;
       text-align: left;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
+      word-wrap: break-word;
     }
 
     th {
       background-color: #E1F5FE;
       color: var(--primary);
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
 
+    /* Larguras personalizadas para evitar quebra feia */
+    th:nth-child(1), td:nth-child(1) { width: 15%; text-align: center; } /* Checkin */
+    th:nth-child(2), td:nth-child(2) { width: 40%; } /* Nome */
+    th:nth-child(3), td:nth-child(3) { width: 15%; text-align: center; } /* Idade */
+    th:nth-child(4), td:nth-child(4) { width: 20%; } /* Igreja */
+    th:nth-child(5), td:nth-child(5) { width: 10%; text-align: center; } /* Ações */
+
     .checkin-box {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       cursor: pointer;
       accent-color: var(--primary);
+    }
+
+    .btn-delete {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      box-shadow: none;
+    }
+
+    .btn-delete:hover {
+      background-color: #d32f2f;
+      transform: none;
     }
 
     .alert-success {
       background-color: #D4EDDA;
       color: #155724;
-      padding: 12px;
+      padding: 10px;
       border-radius: 10px;
       margin-bottom: 15px;
       display: none;
       text-align: center;
       border: 1px solid #c3e6cb;
+      font-size: 0.9rem;
     }
 
     .actions-admin {
@@ -245,17 +299,9 @@
     .btn-secondary {
       background-color: var(--accent);
     }
-
-    .btn-secondary:hover {
-      background-color: #00ACC1;
-    }
     
     .btn-danger {
       background-color: #f44336;
-    }
-    
-    .btn-danger:hover {
-      background-color: #d32f2f;
     }
   </style>
 </head>
@@ -268,15 +314,15 @@
     
     <img src="crianças.jpeg" alt="Foto do Evento" class="image-placeholder">
     
-    <p style="margin-bottom: 20px; color: #555;">Estamos muito felizes em convidar você para o nosso evento especial.</p>
+    <p style="margin-bottom: 20px; color: #555; font-size: 0.9rem;">Estamos muito felizes em convidar você para o nosso evento especial.</p>
     
     <button onclick="startApp()">Avançar para Confirmação</button>
   </div>
 
   <!-- ABAS DE NAVEGAÇÃO -->
   <div id="app-tabs" class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('public')">Confirmar Presença</button>
-    <button class="tab-btn" onclick="switchTab('admin')">Área Admin</button>
+    <button class="tab-btn active" onclick="switchTab('public')">Confirmar</button>
+    <button class="tab-btn" onclick="switchTab('admin')">Admin</button>
   </div>
 
   <!-- VISÃO PÚBLICA -->
@@ -286,7 +332,7 @@
 
     <!-- Contagem Regressiva -->
     <div class="countdown-container">
-      <h3>Faltam para o evento:</h3>
+      <h3 style="font-size: 1rem;">Faltam para o evento:</h3>
       <div class="countdown-timer">
         <div class="timer-unit"><span id="days">00</span><span>Dias</span></div>
         <div class="timer-unit"><span id="hours">00</span><span>Horas</span></div>
@@ -296,14 +342,14 @@
     </div>
 
     <div id="success-message" class="alert-success">
-      ✅ Presença confirmada com sucesso! Nos vemos lá!
+      ✅ Presença confirmada!
     </div>
 
     <!-- Formulário -->
     <form id="rsvp-form">
       <div class="form-group">
         <label for="nome">Nome Completo:</label>
-        <input type="text" id="nome" required placeholder="Digite seu nome completo">
+        <input type="text" id="nome" required placeholder="Digite seu nome">
       </div>
 
       <div class="form-group">
@@ -313,7 +359,7 @@
 
       <div class="form-group">
         <label for="igreja">Comum (Igreja):</label>
-        <input type="text" id="igreja" required placeholder="Nome da sua igreja">
+        <input type="text" id="igreja" required placeholder="Sua igreja">
       </div>
 
       <button type="submit" id="btn-submit">Confirmar Minha Presença</button>
@@ -329,21 +375,39 @@
         <label for="admin-pass">Senha de Acesso:</label>
         <input type="password" id="admin-pass" placeholder="Digite a senha">
       </div>
-      <button type="button" onclick="loginAdmin()">Entrar no Painel</button>
+      <button type="button" onclick="loginAdmin()">Entrar</button>
     </div>
 
     <div id="admin-content" style="display: none;">
-      <p style="margin-bottom: 10px;"><strong>Total de confirmados:</strong> <span id="total-count">0</span></p>
+      <p style="margin-bottom: 10px; font-size: 0.9rem;"><strong>Total:</strong> <span id="total-count">0</span></p>
 
-      <div style="overflow-x: auto;">
+      <!-- Barra de Filtros -->
+      <div class="filters-container">
+        <input type="text" id="filter-name" placeholder="🔍 Buscar nome..." oninput="applyFilters()">
+        
+        <select id="filter-age" onchange="applyFilters()">
+          <option value="all">Idade (Todas)</option>
+          <option value="asc">Menor para Maior</option>
+          <option value="desc">Maior para Menor</option>
+        </select>
+        
+        <select id="filter-checkin" onchange="applyFilters()">
+          <option value="all">Check-in (Todos)</option>
+          <option value="marcado">Feito ✅</option>
+          <option value="pendente">Pendente ❌</option>
+        </select>
+      </div>
+
+      <!-- Tabela -->
+      <div class="table-wrapper">
         <table>
           <thead>
             <tr>
-              <th style="text-align: center;">Check-in</th>
-              <th>Data/Hora</th>
-              <th>Nome Completo</th>
+              <th>Check</th>
+              <th>Nome</th>
               <th>Idade</th>
               <th>Igreja</th>
+              <th>🗑️</th>
             </tr>
           </thead>
           <tbody id="confirmations-list">
@@ -353,8 +417,8 @@
       </div>
 
       <div class="actions-admin">
-        <button class="btn-secondary" onclick="exportToCSV()">Baixar Excel (CSV)</button>
-        <button class="btn-danger" onclick="clearData()">Limpar Lista</button>
+        <button class="btn-secondary" onclick="exportToCSV()">Excel</button>
+        <button class="btn-danger" onclick="clearData()">Limpar Tudo</button>
       </div>
     </div>
   </div>
@@ -382,6 +446,9 @@
 
     const EVENT_DATE = new Date('2026-10-11T00:00:00').getTime();
     const ADMIN_PASSWORD = "403311";
+    
+    // Variável global para armazenar os dados e permitir filtragem
+    window.adminDataList = [];
 
     // --- FUNÇÕES GLOBAIS (window.) ---
 
@@ -412,16 +479,16 @@
       if (passInput === ADMIN_PASSWORD) {
         document.getElementById('admin-login').style.display = 'none';
         document.getElementById('admin-content').style.display = 'block';
-        await renderAdminList();
+        await fetchAdminData();
       } else {
         alert('Senha incorreta!');
       }
     };
 
-    // 4. Buscar e Renderizar Lista do Banco de Dados
-    async function renderAdminList() {
+    // 4. Buscar Dados no Banco
+    async function fetchAdminData() {
       const tbody = document.getElementById('confirmations-list');
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Carregando lista da nuvem...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Carregando...</td></tr>';
       
       try {
         const querySnapshot = await getDocs(collection(db, "confirmacoes"));
@@ -431,46 +498,103 @@
           list.push({ id: doc.id, ...doc.data() });
         });
 
-        document.getElementById('total-count').innerText = list.length;
-        window.adminDataList = list; // Salva para exportar para CSV
-        tbody.innerHTML = '';
+        window.adminDataList = list;
+        window.applyFilters(); // Aplica os filtros e renderiza
 
-        list.forEach((item) => {
-          const isChecked = item.checkin ? 'checked' : '';
-          const bgColor = item.checkin ? 'background-color: #f1f8e9;' : '';
-          
-          const row = document.createElement('tr');
-          row.style = bgColor;
-          row.innerHTML = `
-            <td style="text-align: center;">
-              <input type="checkbox" class="checkin-box" ${isChecked} onchange="toggleCheckin('${item.id}', this.checked)">
-            </td>
-            <td>${item.timestamp}</td>
-            <td><strong>${item.nome}</strong></td>
-            <td>${item.idade}</td>
-            <td>${item.igreja}</td>
-          `;
-          tbody.appendChild(row);
-        });
       } catch (error) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Erro ao carregar dados. Verifique a conexão.</td></tr>';
-        console.error("Erro ao carregar dados: ", error);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Erro de conexão.</td></tr>';
+        console.error("Erro ao carregar: ", error);
       }
     }
 
-    // 5. Atualizar Check-in na Nuvem
+    // 5. Aplicar Filtros e Renderizar a Tabela
+    window.applyFilters = function() {
+      let filtered = [...window.adminDataList];
+
+      // Filtro de Nome
+      const nameFilter = document.getElementById('filter-name').value.toLowerCase();
+      if (nameFilter) {
+        filtered = filtered.filter(item => item.nome.toLowerCase().includes(nameFilter));
+      }
+
+      // Filtro de Check-in
+      const checkinFilter = document.getElementById('filter-checkin').value;
+      if (checkinFilter === 'marcado') {
+        filtered = filtered.filter(item => item.checkin === true);
+      } else if (checkinFilter === 'pendente') {
+        filtered = filtered.filter(item => item.checkin === false);
+      }
+
+      // Ordenação de Idade
+      const ageFilter = document.getElementById('filter-age').value;
+      if (ageFilter === 'asc') {
+        filtered.sort((a, b) => Number(a.idade) - Number(b.idade));
+      } else if (ageFilter === 'desc') {
+        filtered.sort((a, b) => Number(b.idade) - Number(a.idade));
+      }
+
+      // Atualiza a interface
+      document.getElementById('total-count').innerText = filtered.length;
+      const tbody = document.getElementById('confirmations-list');
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum registro encontrado.</td></tr>';
+        return;
+      }
+
+      filtered.forEach((item) => {
+        const isChecked = item.checkin ? 'checked' : '';
+        const bgColor = item.checkin ? 'background-color: #f1f8e9;' : '';
+        
+        const row = document.createElement('tr');
+        row.style = bgColor;
+        row.innerHTML = `
+          <td style="text-align: center;">
+            <input type="checkbox" class="checkin-box" ${isChecked} onchange="toggleCheckin('${item.id}', this.checked)">
+          </td>
+          <td><strong>${item.nome}</strong></td>
+          <td style="text-align: center;">${item.idade}</td>
+          <td>${item.igreja}</td>
+          <td style="text-align: center;">
+            <button class="btn-delete" onclick="deleteSingleEntry('${item.id}', '${item.nome}')">X</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    };
+
+    // 6. Atualizar Check-in na Nuvem
     window.toggleCheckin = async function(docId, isChecked) {
       try {
         const docRef = doc(db, "confirmacoes", docId);
         await updateDoc(docRef, { checkin: isChecked });
-        renderAdminList(); // Atualiza as cores da tabela
+        
+        // Atualiza na lista local e re-renderiza
+        const index = window.adminDataList.findIndex(i => i.id === docId);
+        if(index !== -1) window.adminDataList[index].checkin = isChecked;
+        
+        window.applyFilters(); 
       } catch (error) {
         alert("Erro ao salvar check-in!");
-        console.error("Erro ao atualizar checkin:", error);
       }
     };
 
-    // 6. Exportar para CSV
+    // 7. Apagar UM ÚNICO registro
+    window.deleteSingleEntry = async function(docId, nome) {
+      if (confirm(`Tem certeza que deseja apagar a presença de "${nome}"?`)) {
+        try {
+          await deleteDoc(doc(db, "confirmacoes", docId));
+          // Remove da lista local e re-renderiza
+          window.adminDataList = window.adminDataList.filter(item => item.id !== docId);
+          window.applyFilters();
+        } catch (error) {
+          alert("Erro ao apagar registro.");
+        }
+      }
+    };
+
+    // 8. Exportar para CSV
     window.exportToCSV = function() {
       const list = window.adminDataList || [];
       if (list.length === 0) {
@@ -479,11 +603,11 @@
       }
 
       let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-      csvContent += "Check-in;Data/Hora;Nome Completo;Idade;Igreja\n";
+      csvContent += "Check-in;Nome Completo;Idade;Igreja\n";
 
       list.forEach(item => {
         const checkinStatus = item.checkin ? "Sim" : "Não";
-        csvContent += `"${checkinStatus}";"${item.timestamp}";"${item.nome}";"${item.idade}";"${item.igreja}"\n`;
+        csvContent += `"${checkinStatus}";"${item.nome}";"${item.idade}";"${item.igreja}"\n`;
       });
 
       const encodedUri = encodeURI(csvContent);
@@ -495,9 +619,9 @@
       document.body.removeChild(link);
     };
 
-    // 7. Apagar Tudo no Banco de Dados
+    // 9. Apagar Tudo no Banco de Dados
     window.clearData = async function() {
-      if (confirm('ATENÇÃO: Deseja apagar toda a lista de confirmados DEFINITIVAMENTE da nuvem?')) {
+      if (confirm('ATENÇÃO: Deseja apagar TODA A LISTA DEFINITIVAMENTE da nuvem?')) {
         try {
           const querySnapshot = await getDocs(collection(db, "confirmacoes"));
           const deletePromises = [];
@@ -508,10 +632,10 @@
           
           await Promise.all(deletePromises);
           alert("Lista limpa com sucesso!");
-          renderAdminList();
+          window.adminDataList = [];
+          window.applyFilters();
         } catch (error) {
           alert("Erro ao limpar lista.");
-          console.error(error);
         }
       }
     };
@@ -567,14 +691,13 @@
           document.getElementById('success-message').style.display = 'none';
         }, 4000);
 
-        // Se a aba do admin estiver aberta, atualiza a lista em tempo real
+        // Se a aba do admin estiver aberta, recarrega a lista em tempo real
         if (document.getElementById('admin-content').style.display === 'block') {
-           renderAdminList();
+           fetchAdminData();
         }
 
       } catch (error) {
         alert("Erro ao confirmar presença. Verifique sua internet.");
-        console.error("Erro ao adicionar documento: ", error);
       } finally {
         submitBtn.innerText = "Confirmar Minha Presença";
         submitBtn.disabled = false;
